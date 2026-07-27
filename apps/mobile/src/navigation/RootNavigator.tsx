@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { TaskStatus } from '@quickboard/types';
 import { useAuth } from '../hooks/useAuth';
 import { LoginScreen } from '../screens/LoginScreen';
 import { SignupScreen } from '../screens/SignupScreen';
@@ -15,7 +16,13 @@ export type RootStackParamList = {
   ForgotPassword: undefined;
   Boards: undefined;
   BoardDetail: { boardId: string; boardName: string };
-  TaskDetail: { taskId: string; boardId: string };
+  TaskDetail: {
+    taskId: string;
+    boardId: string;
+    initialTitle: string;
+    initialStatus: TaskStatus;
+    initialSketchUrl?: string | null;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

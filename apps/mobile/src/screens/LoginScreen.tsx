@@ -6,9 +6,9 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  SafeAreaView,
   StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { supabase } from '../lib/supabase';
 import { RootStackParamList } from '../navigation/RootNavigator';

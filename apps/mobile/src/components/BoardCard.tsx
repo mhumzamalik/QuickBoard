@@ -5,13 +5,16 @@ import { Board } from '@quickboard/types';
 interface BoardCardProps {
   board: Board;
   onPress: () => void;
+  onLongPress?: () => void;
 }
 
-export function BoardCard({ board, onPress }: BoardCardProps) {
+
+export function BoardCard({ board, onPress, onLongPress }: BoardCardProps) {
   return (
     <TouchableOpacity
       style={styles.boardCard}
       onPress={onPress}
+      onLongPress={onLongPress}
       activeOpacity={0.8}
     >
       <Text style={styles.boardName}>{board.name}</Text>

@@ -97,12 +97,52 @@ export function useTasks(boardId: string | undefined) {
     }
   };
 
+  // Source of truth for new tasks: the realtime INSERT event (lines 55-57 above).
+  // createTask only fires the insert; the realtime listener updates state.
+  const createTask = async (
+    title: string,
+    boardId: string,
+    userId: string
+  ): Promise<string | null> => {
+    const trimmed = title.trim();
+    if (!trimmed) return 'Task title is required.';
+    if (trimmed.length > 200) return 'Task title must be 200 characters or fewer.';
+
+    try {
+      const { error: err } = await supabase
+        .from('tasks')
+        .insert({ board_id: boardId, owner_id: userId, title: trimmed, status: 'todo' });
+
+      if (err) return err.message;
+      return null;
+    } catch (e: unknown) {
+      return e instanceof Error ? e.message : 'Failed to create task.';
+    }
+  };
+
+  // Realtime DELETE event (lines 61-63) handles state update — no local setTasks needed here.
+  const deleteTask = async (taskId: string): Promise<string | null> => {
+    try {
+      const { error: err } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId);
+
+      if (err) return err.message;
+      return null;
+    } catch (e: unknown) {
+      return e instanceof Error ? e.message : 'Failed to delete task.';
+    }
+  };
+
   return {
     tasks,
     loading,
     error,
     refetch: fetchTasks,
     cycleStatus,
+    createTask,
+    deleteTask,
     setTasks,
   };
 }
