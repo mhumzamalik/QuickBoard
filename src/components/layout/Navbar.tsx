@@ -1,0 +1,111 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { Button } from '../ui/Button';
+import { LayoutGrid, LogOut, Moon, Sun, User as UserIcon } from 'lucide-react';
+import { useToast } from '../ui/Toast';
+
+export const Navbar: React.FC = () => {
+  const router = RouterHook();
+  const { showToast } = useToast();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  function RouterHook() {
+    return useRouter();
+  }
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email || null);
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user?.email || null);
+    });
+
+    // Check dark mode
+    if (typeof window !== 'undefined') {
+      const isDark = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDark);
+    }
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const toggleDarkMode = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove('dark');
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      setIsDarkMode(true);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      showToast('Signed out successfully', 'info');
+      router.push('/login');
+    } catch (err: any) {
+      showToast(err.message || 'Error signing out', 'error');
+    }
+  };
+
+  return (
+    <header className="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <Link href="/dashboard" className="flex items-center gap-2.5 group">
+          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
+            <LayoutGrid className="w-5 h-5" />
+          </div>
+          <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">
+            Quick<span className="text-blue-600">Board</span>
+          </span>
+        </Link>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+
+          {userEmail ? (
+            <div className="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-800">
+              <div className="hidden sm:flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300">
+                <UserIcon className="w-4 h-4 text-blue-500" />
+                <span>{userEmail}</span>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleSignOut} title="Sign out">
+                <LogOut className="w-4 h-4 text-rose-500" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button variant="primary" size="sm">
+                  Get Started
+                </Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+};
