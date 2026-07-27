@@ -1,0 +1,16 @@
+{
+  "name": "quickboard-monorepo",
+  "private": true,
+  "scripts": {
+    "dev:web": "pnpm --filter @quickboard/web dev",
+    "build:web": "pnpm --filter @quickboard/web build",
+    "dev:extension": "pnpm --filter @quickboard/extension dev",
+    "build:extension": "pnpm --filter @quickboard/extension build",
+    "dev:mobile": "pnpm --filter @quickboard/mobile start",
+    "dev:desktop": "pnpm --filter @quickboard/desktop dev"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^5.4.5"
+  }
+}
