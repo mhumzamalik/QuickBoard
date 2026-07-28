@@ -1,5 +1,9 @@
 # Dependencies
 node_modules/
+.pnpm-store/
+
+# Expo
+.expo/
 
 # Environment files
 .env
@@ -11,5 +15,18 @@ dist/
 build/
 .next/
 
+# Rust / Tauri
+target/
+**/target/
+src-tauri/target/
+
 # Logs
 *.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

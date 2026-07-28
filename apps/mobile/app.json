@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "QuickBoard",
-    "slug": "quickboard-mobile",
+    "slug": "muhammad-hamza",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,10 +18,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0f172a"
-      }
+      },
+      "package": "com.muhammadhamzasteam.muhammadhamza"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3a0d2416-a9a6-43bc-b334-cfcb121d9403"
+      }
+    },
+    "owner": "muhammadhamzas-team"
   }
 }
