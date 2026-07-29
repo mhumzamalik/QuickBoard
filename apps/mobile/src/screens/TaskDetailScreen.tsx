@@ -38,7 +38,6 @@ export function TaskDetailScreen({ route, navigation }: Props) {
   const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  // Sketch modal control
   const [isSketchModalOpen, setIsSketchModalOpen] = useState(false);
   const [isClearingSketch, setIsClearingSketch] = useState(false);
 
@@ -157,7 +156,6 @@ export function TaskDetailScreen({ route, navigation }: Props) {
           </View>
         ) : null}
 
-        {/* Title field */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Title</Text>
           <TextInput
@@ -179,7 +177,6 @@ export function TaskDetailScreen({ route, navigation }: Props) {
           <Text style={styles.charCount}>{title.trim().length}/200</Text>
         </View>
 
-        {/* Status segmented control */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Status</Text>
           <View style={styles.segmentedControl}>
@@ -211,7 +208,6 @@ export function TaskDetailScreen({ route, navigation }: Props) {
           </View>
         </View>
 
-        {/* Sketch / Canvas Section */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Sketch Board / Whiteboard</Text>
 
@@ -257,7 +253,6 @@ export function TaskDetailScreen({ route, navigation }: Props) {
         </View>
       </ScrollView>
 
-      {/* Sketch Modal */}
       <SketchBoardModal
         visible={isSketchModalOpen}
         task={taskForSketch}
@@ -371,7 +366,6 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginTop: 4,
   },
-  // Segmented control
   segmentedControl: {
     flexDirection: 'row',
     backgroundColor: '#1e293b',
@@ -404,7 +398,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '700',
   },
-  // Sketch section
   sketchContainer: {
     backgroundColor: '#1e293b',
     borderRadius: 12,

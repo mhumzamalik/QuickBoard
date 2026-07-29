@@ -36,7 +36,6 @@ export default function App() {
 
   const fetchData = async (userId: string) => {
     setLoading(true);
-    // Fetch boards
     const { data: bData } = await supabase
       .from('boards')
       .select('*')
@@ -48,7 +47,6 @@ export default function App() {
       setSelectedBoardId(bData[0].id);
     }
 
-    // Fetch 5 most recent tasks across all boards
     const { data: tData } = await supabase
       .from('tasks')
       .select('*')
@@ -154,7 +152,6 @@ export default function App() {
 
   return (
     <div className="w-80 p-4 bg-slate-900 text-white space-y-4 font-sans">
-      {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <LayoutGrid className="w-5 h-5 text-blue-500" />
@@ -169,7 +166,6 @@ export default function App() {
         </button>
       </div>
 
-      {/* Quick Task Add */}
       <form onSubmit={handleAddTask} className="space-y-2">
         {boards.length > 0 && (
           <select
@@ -202,7 +198,6 @@ export default function App() {
         </div>
       </form>
 
-      {/* 5 Recent Tasks */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider">
           <span>Recent Tasks</span>

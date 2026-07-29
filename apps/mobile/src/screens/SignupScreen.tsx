@@ -24,7 +24,6 @@ export function SignupScreen({ navigation }: Props) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  // true when Supabase requires email confirmation (no session returned)
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
 
   const [fullNameError, setFullNameError] = useState<string | null>(null);
@@ -105,7 +104,6 @@ export function SignupScreen({ navigation }: Props) {
       }
 
       if (data?.user) {
-        // Upsert user profile to guarantee full name is saved
         await supabase.from('profiles').upsert({
           id: data.user.id,
           display_name: trimmedName,
@@ -113,12 +111,8 @@ export function SignupScreen({ navigation }: Props) {
       }
 
       if (!data.session) {
-        // Email confirmation is enabled on this Supabase project.
-        // Show the "check your email" state — user must confirm before signing in.
         setAwaitingConfirmation(true);
       }
-      // If data.session is present, useAuth's onAuthStateChange fires automatically
-      // and RootNavigator switches to the authenticated stack. Nothing to do here.
     } catch (e: unknown) {
       setServerError(
         e instanceof Error ? e.message : 'Sign up failed. Please try again.'
@@ -128,7 +122,6 @@ export function SignupScreen({ navigation }: Props) {
     }
   };
 
-  // --- Email confirmation required state ---
   if (awaitingConfirmation) {
     return (
       <SafeAreaView style={styles.container}>
@@ -152,7 +145,6 @@ export function SignupScreen({ navigation }: Props) {
     );
   }
 
-  // --- Sign Up form ---
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -169,7 +161,6 @@ export function SignupScreen({ navigation }: Props) {
           </View>
         ) : null}
 
-        {/* Full Name */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Full Name</Text>
           <TextInput
@@ -189,7 +180,6 @@ export function SignupScreen({ navigation }: Props) {
           ) : null}
         </View>
 
-        {/* Email */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -208,7 +198,6 @@ export function SignupScreen({ navigation }: Props) {
           {emailError ? <Text style={styles.fieldError}>{emailError}</Text> : null}
         </View>
 
-        {/* Password */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Password</Text>
           <TextInput
@@ -228,7 +217,6 @@ export function SignupScreen({ navigation }: Props) {
           ) : null}
         </View>
 
-        {/* Confirm Password */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Confirm Password</Text>
           <TextInput
@@ -362,7 +350,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  // Email confirmation state
   confirmedBox: {
     flex: 1,
     justifyContent: 'center',

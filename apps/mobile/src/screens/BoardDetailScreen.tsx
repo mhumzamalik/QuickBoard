@@ -29,13 +29,11 @@ export function BoardDetailScreen({ route, navigation }: Props) {
   const { user } = useAuth();
   const { tasks, loading, error, createTask, deleteTask } = useTasks(boardId);
 
-  // --- Add task state ---
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [titleError, setTitleError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
-  // --- Delete task state ---
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -143,7 +141,6 @@ export function BoardDetailScreen({ route, navigation }: Props) {
         />
       )}
 
-      {/* Add Task Modal */}
       <Modal
         transparent
         animationType="slide"
@@ -194,7 +191,6 @@ export function BoardDetailScreen({ route, navigation }: Props) {
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* Delete Task Confirm Dialog */}
       <ConfirmDialog
         visible={taskToDelete !== null}
         title="Delete Task"
@@ -275,7 +271,6 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
   },
-  // Modal
   modalOverlay: {
     flex: 1,
     justifyContent: 'flex-end',

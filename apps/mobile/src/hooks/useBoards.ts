@@ -56,7 +56,6 @@ export function useBoards(userId: string | undefined) {
       created_at: new Date().toISOString(),
     };
 
-    // Optimistic insert
     setBoards((prev) => [tempBoard, ...prev]);
 
     try {
@@ -81,7 +80,6 @@ export function useBoards(userId: string | undefined) {
     }
   };
 
-  // No realtime subscription for boards — use optimistic removal with fetchBoards rollback.
   const deleteBoard = async (boardId: string): Promise<string | null> => {
     setBoards((prev) => prev.filter((b) => b.id !== boardId));
 
@@ -92,7 +90,7 @@ export function useBoards(userId: string | undefined) {
         .eq('id', boardId);
 
       if (err) {
-        fetchBoards(); // Restore list
+        fetchBoards();
         return err.message;
       }
       return null;

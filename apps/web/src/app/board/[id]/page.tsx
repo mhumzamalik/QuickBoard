@@ -31,30 +31,24 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Presence state
   const [onlineUsers, setOnlineUsers] = useState<Array<{ user_id: string; display_name: string }>>([]);
 
-  // Create Task state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskStatus, setTaskStatus] = useState<TaskStatus>('todo');
   const [createError, setCreateError] = useState<string | undefined>(undefined);
   const [isCreating, setIsCreating] = useState(false);
 
-  // Edit Task state
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editStatus, setEditStatus] = useState<TaskStatus>('todo');
   const [editError, setEditError] = useState<string | undefined>(undefined);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Sketch modal task state
   const [canvasTask, setCanvasTask] = useState<Task | null>(null);
 
-  // Cache the current user so the realtime effect can build channels synchronously
   const currentUserRef = useRef<{ id: string; email: string } | null>(null);
 
-  // Fetch initial board and tasks
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -63,13 +57,11 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
         router.push('/login');
         return;
       }
-      // Cache for use in the realtime effect
       currentUserRef.current = {
         id: userData.user.id,
         email: userData.user.email || 'Anonymous',
       };
 
-      // Fetch Board
       const { data: bData, error: bError } = await supabase
         .from('boards')
         .select('*')
@@ -83,7 +75,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
       }
       setBoard(bData);
 
-      // Fetch Tasks
       const { data: tData, error: tError } = await supabase
         .from('tasks')
         .select('*')
@@ -106,20 +97,14 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
     fetchData();
   }, [fetchData]);
 
-  // Realtime subscription setup
   useEffect(() => {
     if (!boardId) return;
 
-    // Channels created inside the async IIFE; refs let the cleanup see them.
     let taskChannel: ReturnType<typeof supabase.channel> | null = null;
     let presenceChannel: ReturnType<typeof supabase.channel> | null = null;
-    // Guard against React Strict-Mode double-invoke: if the effect is cleaned up
-    // before the async IIFE resolves, skip channel creation entirely.
     let cancelled = false;
 
     (async () => {
-      // Resolve the current user — use the cached ref when possible so we
-      // don't need a network round-trip on every boardId change.
       let user = currentUserRef.current;
       if (!user) {
         const { data } = await supabase.auth.getUser();
@@ -128,13 +113,10 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
         currentUserRef.current = user;
       }
 
-      // Bail out if the cleanup already ran (Strict Mode / fast navigation).
       if (cancelled) return;
 
       const { id: userId, email: userEmail } = user;
 
-      // ── 1. Task postgres_changes channel ──────────────────────────────────
-      // All .on() handlers MUST be chained before .subscribe().
       taskChannel = supabase
         .channel(`realtime:tasks:${boardId}`)
         .on(
@@ -165,18 +147,14 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
             }
           }
         )
-        .subscribe(); // ← only subscribe() call for this channel
+        .subscribe();
 
-      // ── 2. Presence channel ───────────────────────────────────────────────
-      // Create the channel object, chain ALL .on() handlers, THEN call
-      // .subscribe() exactly once as the very last step.
       presenceChannel = supabase.channel(`presence:board:${boardId}`, {
         config: { presence: { key: userId } },
       });
 
       presenceChannel
         .on('presence', { event: 'sync' }, () => {
-          // presenceChannel is guaranteed non-null here (closed over above)
           const state = presenceChannel!.presenceState();
           const users: Array<{ user_id: string; display_name: string }> = [];
           Object.keys(state).forEach((key) => {
@@ -190,7 +168,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
           });
           setOnlineUsers(users);
         })
-        // ↓ subscribe() is the LAST call — no .on() may appear after this
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
             await presenceChannel!.track({
@@ -209,7 +186,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
     };
   }, [boardId, showToast]);
 
-  // Create Task handler (Optimistic UI)
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreateError(undefined);
@@ -236,7 +212,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
       updated_at: new Date().toISOString(),
     };
 
-    // Optimistically add task
     setTasks((prev) => [...prev, optimisticTask]);
     setTaskTitle('');
     setIsCreateOpen(false);
@@ -257,7 +232,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
 
       if (error) {
         showToast(error.message, 'error');
-        // Rollback
         setTasks((prev) => prev.filter((t) => t.id !== tempId));
       } else {
         showToast('Task added!', 'success');
@@ -271,7 +245,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
     }
   };
 
-  // Toggle Status handler (Optimistic UI)
   const handleCycleStatus = async (task: Task) => {
     const nextStatus: Record<TaskStatus, TaskStatus> = {
       todo: 'in_progress',
@@ -280,7 +253,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
     };
     const newStatus = nextStatus[task.status];
 
-    // Optimistic Update
     setTasks((prev) =>
       prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t))
     );
@@ -293,7 +265,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
 
       if (error) {
         showToast(error.message, 'error');
-        // Rollback
         setTasks((prev) =>
           prev.map((t) => (t.id === task.id ? { ...t, status: task.status } : t))
         );
@@ -306,7 +277,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
     }
   };
 
-  // Update Task Title / Status Modal submit
   const handleUpdateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingTask) return;
@@ -321,7 +291,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
     setIsUpdating(true);
     const updated = { ...editingTask, title: editTitle, status: editStatus };
 
-    // Optimistic update
     setTasks((prev) => prev.map((t) => (t.id === editingTask.id ? updated : t)));
     setEditingTask(null);
 
@@ -333,7 +302,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
 
       if (error) {
         showToast(error.message, 'error');
-        // Rollback
         setTasks((prev) => prev.map((t) => (t.id === editingTask.id ? editingTask : t)));
       } else {
         showToast('Task updated', 'success');
@@ -345,7 +313,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
     }
   };
 
-  // Delete Task handler (Optimistic UI)
   const handleDeleteTask = async (taskId: string) => {
     const original = tasks.find((t) => t.id === taskId);
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
@@ -378,8 +345,7 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Navigation Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard"
@@ -391,7 +357,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               {isLoading ? <Skeleton className="h-8 w-48" /> : board?.name || 'Board Details'}
             </h1>
-            {/* Realtime presence status bar */}
             <div className="flex items-center gap-2 mt-1">
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -412,7 +377,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
         </Button>
       </div>
 
-      {/* Task Kanban Columns */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Skeleton className="h-96 w-full" />
@@ -428,7 +392,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
                 key={col.status}
                 className="bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-4 flex flex-col gap-3 min-h-[400px]"
               >
-                {/* Column header */}
                 <div className="flex items-center justify-between px-2 py-1">
                   <div className="flex items-center gap-2">
                     <StatusBadge status={col.status} />
@@ -447,7 +410,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
                   </button>
                 </div>
 
-                {/* Task items */}
                 {colTasks.length === 0 ? (
                   <div className="flex-1 flex flex-col items-center justify-center p-6 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl text-center">
                     <p className="text-xs text-slate-400">No tasks in {col.label}</p>
@@ -484,7 +446,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
                         </div>
                       </div>
 
-                      {/* Sketch image preview if present */}
                       {task.sketch_url && (
                         <div className="relative w-full h-32 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-white">
                           <Image
@@ -497,7 +458,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
                         </div>
                       )}
 
-                      {/* Action footer */}
                       <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
                         <StatusBadge
                           status={task.status}
@@ -520,7 +480,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
         </div>
       )}
 
-      {/* Add Task Modal */}
       <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Add New Task">
         <form onSubmit={handleCreateTask} className="space-y-4">
           <Input
@@ -558,7 +517,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
         </form>
       </Modal>
 
-      {/* Edit Task Modal */}
       <Modal
         isOpen={Boolean(editingTask)}
         onClose={() => setEditingTask(null)}
@@ -599,7 +557,6 @@ export default function BoardDetailPage({ params }: BoardPageProps) {
         </form>
       </Modal>
 
-      {/* Canvas Sketch Modal */}
       {canvasTask && (
         <CanvasModal
           isOpen={Boolean(canvasTask)}

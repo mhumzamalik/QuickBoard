@@ -28,14 +28,12 @@ export function BoardsScreen({ navigation }: Props) {
   const { user, signOut } = useAuth();
   const { boards, loading, error, createBoard, deleteBoard } = useBoards(user?.id);
 
-  // --- Create board state ---
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [boardName, setBoardName] = useState('');
   const [nameError, setNameError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // --- Delete board state ---
   const [boardToDelete, setBoardToDelete] = useState<Board | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -146,7 +144,6 @@ export function BoardsScreen({ navigation }: Props) {
         />
       )}
 
-      {/* Create Board Modal */}
       <Modal
         transparent
         animationType="slide"
@@ -197,7 +194,6 @@ export function BoardsScreen({ navigation }: Props) {
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* Delete Board Confirm Dialog */}
       <ConfirmDialog
         visible={boardToDelete !== null}
         title="Delete Board"
@@ -293,7 +289,6 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
   },
-  // Modal
   modalOverlay: {
     flex: 1,
     justifyContent: 'flex-end',

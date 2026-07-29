@@ -327,7 +327,6 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Auth state
   const [isSignUp, setIsSignUp] = useState(false);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -338,18 +337,15 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(false);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
 
-  // Per-field sign-up errors (match Mobile)
   const [fullNameError, setFullNameError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  // Sign-in error banner
   const [authError, setAuthError] = useState('');
   const [authSuccess, setAuthSuccess] = useState('');
 
-  // Data state
   const [boards, setBoards] = useState<Board[]>([]);
   const [boardsLoading, setBoardsLoading] = useState(false);
   const [selectedBoard, setSelectedBoard] = useState<Board | null>(null);
@@ -357,21 +353,17 @@ export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [tasksLoading, setTasksLoading] = useState(false);
 
-  // Global App Error Banner state
   const [appError, setAppError] = useState<string | null>(null);
 
-  // Modal / Form state
   const [showCreateBoard, setShowCreateBoard] = useState(false);
   const [newBoardName, setNewBoardName] = useState('');
 
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
-  // Inline Title Editing state
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
 
-  // Sketch Modal state
   const [sketchTask, setSketchTask] = useState<Task | null>(null);
 
   useEffect(() => {
@@ -653,7 +645,6 @@ export default function App() {
   }
 
   if (!session) {
-    // --- "Check your email" confirmation state (Sign Up only) ---
     if (awaitingConfirmation) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
@@ -685,11 +676,9 @@ export default function App() {
       );
     }
 
-    // --- Sign In / Sign Up form ---
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4 overflow-y-auto">
         <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 space-y-6 shadow-2xl my-8">
-          {/* Header */}
           <div className="text-center space-y-2">
             <div className="inline-flex p-3 rounded-2xl bg-blue-500/10 text-blue-500 mb-2">
               <LayoutGrid className="w-8 h-8" />
@@ -704,7 +693,6 @@ export default function App() {
             </p>
           </div>
 
-          {/* Server-level error banner (sign-up) */}
           {isSignUp && serverError && (
             <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl">
               <p className="text-xs text-rose-400 text-center font-medium">{serverError}</p>
@@ -712,7 +700,6 @@ export default function App() {
           )}
 
           <form onSubmit={handleAuthSubmit} className="space-y-4">
-            {/* Full Name — sign-up only */}
             {isSignUp && (
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -752,7 +739,6 @@ export default function App() {
               )}
             </div>
 
-            {/* Password */}
             <div className="space-y-1">
               <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                 Password
@@ -781,7 +767,6 @@ export default function App() {
               )}
             </div>
 
-            {/* Confirm Password — sign-up only */}
             {isSignUp && (
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -812,7 +797,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Sign-in level error/success */}
             {!isSignUp && authError && (
               <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl">
                 <p className="text-xs text-rose-400 text-center font-medium">{authError}</p>
@@ -822,7 +806,6 @@ export default function App() {
               <p className="text-xs text-emerald-400 font-medium text-center">{authSuccess}</p>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={authLoading}
@@ -839,7 +822,6 @@ export default function App() {
             </button>
           </form>
 
-          {/* Toggle Sign In / Sign Up */}
           <div className="text-center text-xs text-slate-500 border-t border-slate-800 pt-4">
             {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
             <button
@@ -871,7 +853,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans">
-      {/* Top Navbar */}
       <header className="h-16 border-b border-slate-800/80 px-6 flex items-center justify-between bg-slate-900/50 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-blue-600/20 text-blue-500">
@@ -892,9 +873,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main className="flex-1 max-w-6xl w-full mx-auto p-6 space-y-6">
-        {/* Reusable App Error Banner */}
         {appError && (
           <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center justify-between text-rose-300 text-sm">
             <div className="flex items-center gap-2">
@@ -911,7 +890,6 @@ export default function App() {
         )}
 
         {selectedBoard ? (
-          /* Board Task View */
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -933,7 +911,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Create Task Modal */}
             {showCreateTask && (
               <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl">
@@ -976,7 +953,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Sketch Modal */}
             {sketchTask && (
               <SketchModal
                 task={sketchTask}
@@ -1132,7 +1108,6 @@ export default function App() {
             )}
           </div>
         ) : (
-          /* Boards List View */
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-white">Your Boards</h1>
@@ -1145,7 +1120,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Create Board Modal */}
             {showCreateBoard && (
               <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl">

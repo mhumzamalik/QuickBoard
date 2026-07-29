@@ -87,7 +87,6 @@ export function useTasks(boardId: string | undefined) {
 
       if (err) {
         setError(err.message);
-        // Rollback
         setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: task.status } : t)));
       }
     } catch (e: unknown) {
@@ -97,8 +96,6 @@ export function useTasks(boardId: string | undefined) {
     }
   };
 
-  // Source of truth for new tasks: the realtime INSERT event (lines 55-57 above).
-  // createTask only fires the insert; the realtime listener updates state.
   const createTask = async (
     title: string,
     boardId: string,
@@ -120,7 +117,6 @@ export function useTasks(boardId: string | undefined) {
     }
   };
 
-  // Realtime DELETE event (lines 61-63) handles state update — no local setTasks needed here.
   const deleteTask = async (taskId: string): Promise<string | null> => {
     try {
       const { error: err } = await supabase

@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Button } from '../ui/Button';
-import { LayoutGrid, LogOut, Moon, Sun, User as UserIcon } from 'lucide-react';
+import { Download, LayoutGrid, LogOut, Moon, Sun, User as UserIcon } from 'lucide-react';
+import { DOWNLOAD_LINKS } from '@/lib/downloadLinks';
 import { useToast } from '../ui/Toast';
 
 export const Navbar: React.FC = () => {
@@ -13,6 +14,8 @@ export const Navbar: React.FC = () => {
   const { showToast } = useToast();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false);
+  const downloadRef = useRef<HTMLDivElement>(null);
 
   function RouterHook() {
     return useRouter();
@@ -27,7 +30,6 @@ export const Navbar: React.FC = () => {
       setUserEmail(session?.user?.email || null);
     });
 
-    // Check dark mode
     if (typeof window !== 'undefined') {
       const isDark = document.documentElement.classList.contains('dark');
       setIsDarkMode(isDark);
@@ -36,6 +38,16 @@ export const Navbar: React.FC = () => {
     return () => {
       authListener.subscription.unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (downloadRef.current && !downloadRef.current.contains(e.target as Node)) {
+        setIsDownloadOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const toggleDarkMode = () => {
@@ -78,6 +90,58 @@ export const Navbar: React.FC = () => {
           >
             {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
+
+          <div ref={downloadRef} className="relative">
+            <button
+              onClick={() => setIsDownloadOpen((v) => !v)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+              aria-label="Download apps"
+              aria-expanded={isDownloadOpen}
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Download</span>
+            </button>
+
+            {isDownloadOpen && (
+              <div className="absolute right-0 mt-2 w-52 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50 overflow-hidden z-50">
+                <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    Get the app
+                  </p>
+                </div>
+                <a
+                  href={DOWNLOAD_LINKS.mobileApp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsDownloadOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <span className="text-base">📱</span>
+                  <span>Mobile App</span>
+                </a>
+                <a
+                  href={DOWNLOAD_LINKS.desktopApp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsDownloadOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <span className="text-base">💻</span>
+                  <span>Desktop App</span>
+                </a>
+                <a
+                  href={DOWNLOAD_LINKS.chromeExtension}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsDownloadOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <span className="text-base">🧩</span>
+                  <span>Chrome Extension</span>
+                </a>
+              </div>
+            )}
+          </div>
 
           {userEmail ? (
             <div className="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-800">

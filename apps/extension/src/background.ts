@@ -27,7 +27,6 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
       .order('created_at', { ascending: false });
 
     if (!boards || boards.length === 0) {
-      // Create a default board if none exists
       const { data: defaultBoard } = await supabase
         .from('boards')
         .insert([{ name: 'Quick Notes', owner_id: userId }])
@@ -45,7 +44,6 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
         ]);
       }
     } else {
-      // Insert to user's primary/first board
       await supabase.from('tasks').insert([
         {
           board_id: boards[0].id,
