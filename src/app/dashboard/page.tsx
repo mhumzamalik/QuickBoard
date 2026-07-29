@@ -20,7 +20,6 @@ export default function DashboardPage() {
   const [boards, setBoards] = useState<Board[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Modal states
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newBoardName, setNewBoardName] = useState('');
   const [createError, setCreateError] = useState<string | undefined>(undefined);
@@ -156,7 +155,6 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
@@ -171,7 +169,6 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      {/* Board list */}
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <Skeleton className="h-40 w-full" />
@@ -179,7 +176,6 @@ export default function DashboardPage() {
           <Skeleton className="h-40 w-full" />
         </div>
       ) : boards.length === 0 ? (
-        /* Empty State */
         <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 my-12 space-y-4">
           <div className="p-4 rounded-full bg-blue-50 dark:bg-blue-950/50 text-blue-600">
             <FolderPlus className="w-10 h-10" />
@@ -253,7 +249,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Create Board Modal */}
       <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create New Board">
         <form onSubmit={handleCreateBoard} className="space-y-4">
           <Input
@@ -275,7 +270,6 @@ export default function DashboardPage() {
         </form>
       </Modal>
 
-      {/* Rename Board Modal */}
       <Modal
         isOpen={Boolean(editingBoard)}
         onClose={() => setEditingBoard(null)}

@@ -67,7 +67,7 @@ export const CanvasModal: React.FC<CanvasModalProps> = ({
   const handleUndo = () => {
     if (history.length <= 1) return;
     const newHistory = [...history];
-    newHistory.pop(); // Remove current state
+    newHistory.pop();
     const previousState = newHistory[newHistory.length - 1];
     setHistory(newHistory);
 
@@ -186,7 +186,6 @@ export const CanvasModal: React.FC<CanvasModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Sketch for "${task.title}"`} maxWidth="max-w-2xl">
       <div className="flex flex-col gap-4">
-        {/* Controls Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-slate-500 flex items-center gap-1">
@@ -238,7 +237,6 @@ export const CanvasModal: React.FC<CanvasModalProps> = ({
           </div>
         </div>
 
-        {/* Canvas Area */}
         <div className="relative w-full border border-slate-300 dark:border-slate-700 rounded-xl overflow-hidden shadow-inner bg-white flex justify-center items-center">
           <canvas
             ref={canvasRef}
@@ -255,7 +253,6 @@ export const CanvasModal: React.FC<CanvasModalProps> = ({
           />
         </div>
 
-        {/* Footer actions */}
         <div className="flex justify-end gap-3 mt-2">
           <Button variant="outline" onClick={onClose}>
             Cancel
